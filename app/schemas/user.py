@@ -64,3 +64,25 @@ class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class RefreshResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    data: Optional[None] = None
+
+class ForgotPasswordSchema(BaseModel):
+    phone: str
+
+class ResetPasswordResponse(BaseModel):
+    message: str
+    data: Optional[None] = None
+
+class ResetPasswordSchema(BaseModel):
+    phone: str
+    otp: str = Field(..., min_length=4, max_length=6)
+    new_password: str
