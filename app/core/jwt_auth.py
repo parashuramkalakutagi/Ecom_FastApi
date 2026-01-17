@@ -5,29 +5,39 @@ from jose import jwt, JWTError
 # app/services/token_blacklist.py
 from datetime import datetime, timezone
 from jose import jwt
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.Redis_auth import redis_client
 from decouple import config
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from app.db.config import SessionDep, get_session
+from app.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 SECRET_KEY = config("SECRET_KEY")
 ALGORITHM = config("ALGORITHM")
 
+
+
 def verify_jwt_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
         user_id: str = payload.get("sub")
-        if user_id is None:
+        user_email: str = payload.get("email")
+        # print(payload.items())
+
+        if not user_id or not user_email:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token payload",
+                detail="Invalid token data",
             )
 
-        # Optional: token expiry check
+        # Optional: expiry check
         exp = payload.get("exp")
         if exp and datetime.fromtimestamp(exp, tz=timezone.utc) < datetime.now(timezone.utc):
             raise HTTPException(
@@ -37,8 +47,7 @@ def verify_jwt_token(token: str = Depends(oauth2_scheme)):
 
         return {
             "user_id": int(user_id),
-            "email": payload.get("email"),
-            "role": payload.get("role") or None,
+            "email": user_email,
         }
 
     except JWTError:
@@ -46,6 +55,47 @@ def verify_jwt_token(token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
+
+
+
+
+async def require_admin( user_payload: dict = Depends(verify_jwt_token),db: AsyncSession = Depends(get_session)):
+    # Validate token payload
+    if not isinstance(user_payload, dict):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Invalid token payload",
+        )
+
+    user_id = user_payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing user_id in token",
+        )
+
+    # Fetch user
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+
+    # Ensure user has admin role
+    if not getattr(user, "is_admin", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access only",
+        )
+
+    return user
+
+
+
+
 
 
 
