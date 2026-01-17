@@ -40,8 +40,8 @@ async def create_user(db: AsyncSession, user: UserCreate):
 
     db.add(new_user)
     await db.commit()
-    access_token = create_access_token({"sub": str(new_user.id), "token_type": "access"})
-    refresh_token = create_refresh_token({"sub": str(new_user.id), "token_type": "refresh"})
+    access_token = create_access_token(data={"sub": str(new_user.id),"email":new_user.email, "token_type": "access"})
+    refresh_token = create_refresh_token(data={"sub": str(new_user.id),"email":new_user.email, "token_type": "access"})
     await db.refresh(new_user)
 
     return {
