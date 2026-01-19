@@ -32,9 +32,6 @@ async def send_verification_email_user(
 
 
 
-
-
-
 @router.get("/verify-email")
 async def verify_email(token: str, db:SessionDep ):
     try:

@@ -8,6 +8,12 @@ from datetime import datetime,timedelta,timezone
 from app.db.base import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from typing import TYPE_CHECKING
+
+
+
+if TYPE_CHECKING:
+    from app.models.cart import Cart_Item
 
 
 class ProductCategory(Base):
@@ -41,6 +47,12 @@ class Product(Base):
         secondary="product_categories",
         back_populates="products",
         lazy="selectin"
+    )
+
+    cart_item: Mapped[list["Cart_Item"]] = relationship(
+        "Cart_Item",
+        back_populates="product",
+        cascade="all, delete, delete-orphan",
     )
 
 

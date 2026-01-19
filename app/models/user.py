@@ -7,6 +7,11 @@ from datetime import datetime,timedelta,timezone
 from app.db.base import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.cart import Cart_Item
+
 
 
 class GenderEnum(str, enum.Enum):
@@ -45,3 +50,8 @@ class User(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
+    cart_item: Mapped[list["Cart_Item"]] = relationship(
+        "Cart_Item",
+        back_populates="user",
+        cascade="all, delete, delete-orphan",
+    )
