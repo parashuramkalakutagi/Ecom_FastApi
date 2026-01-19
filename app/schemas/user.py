@@ -86,3 +86,4 @@ class ResetPasswordSchema(BaseModel):
     phone: str
     otp: str = Field(..., min_length=4, max_length=6)
     new_password: str
+

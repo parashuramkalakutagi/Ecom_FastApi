@@ -9,36 +9,14 @@ from app.models import User
 
 router = APIRouter(prefix="/v1/users", tags=["Account"])
 
-#
-# @router.post("/send_verification_email", status_code=status.HTTP_200_OK)
-# async def send_verification_email_user(user:User = Depends(verify_jwt_token),):
-#     user_email = user["email"]
-#     token = create_email_token(user_email)
-#     await send_verification_email(user_email, token)
-#
-#     return {"message": " Verification email sent."}
 
-
-# @router.post("/send_verification_email", status_code=status.HTTP_200_OK)
-# async def send_verification_email_user(
-#     user = Depends(verify_jwt_token),
-# ):
-#     user_email = user["email"]  # ✅ FIXED HERE
-#
-#     if not user_email:
-#         raise HTTPException(status_code=400, detail="User email not found")
-#
-#     token = create_email_token(user_email)
-#     await send_verification_email(user_email, token)
-#
-#     return {"message": "Verification email sent"}
 
 
 @router.post("/send_verification_email", status_code=status.HTTP_200_OK)
 async def send_verification_email_user(
     user: dict = Depends(verify_jwt_token),
 ):
-    # 🔍 SAFETY CHECK
+    # SAFETY CHECK
     if not isinstance(user, dict):
         raise HTTPException(status_code=500, detail="Invalid user payload")
 
@@ -51,9 +29,6 @@ async def send_verification_email_user(
     await send_verification_email(user_email, token)
 
     return {"message": "Verification email sent"}
-
-
-
 
 
 
