@@ -17,7 +17,7 @@ class ProductMini(BaseModel):
     description: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CategoryResponses(BaseModel):
@@ -26,7 +26,7 @@ class CategoryResponses(BaseModel):
     products: list[ProductMini]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CategoryBase(BaseModel):
@@ -93,7 +93,7 @@ class ProductPatch(BaseModel):
     category_ids: Optional[List[int]] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProductUpdate(BaseModel):
     title : str | None = None
