@@ -1,14 +1,7 @@
-import uuid
-from datetime import datetime, date
-from decimal import Decimal
+from datetime import datetime
 from typing import Optional, List
+from pydantic import BaseModel
 
-from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, Field, field_validator
-from enum import Enum
-
-from pydantic_extra_types.phone_numbers import PhoneNumber
-from starlette import status
 
 
 class ProductMini(BaseModel):
@@ -75,14 +68,6 @@ class PaginatedProductResponse(BaseModel):
 
 class DeleteResponse(BaseModel):
     msg: str
-
-# class ProductUpdate(BaseModel):
-#     title: str | None
-#     description: str | None
-#     price: float | None
-#     slug: str | None
-#     stock_quantity: int | None
-#     category_ids: List[int] | None
 
 
 class ProductPatch(BaseModel):
