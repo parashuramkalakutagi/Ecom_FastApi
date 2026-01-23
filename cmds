@@ -1,0 +1,7 @@
+
+project run cmd
+    uvicorn app.main:app --reload
+
+migrations commands
+   alembic revision --autogenerate -m "create shipping table"
+   alembic upgrade head
