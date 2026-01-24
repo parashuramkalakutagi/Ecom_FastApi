@@ -9,8 +9,13 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 
+
+
 if TYPE_CHECKING:
     from app.models.cart import Cart_Item
+    from app.models.shipping_model import ShippingModel
+    from app.models.payment import PaymentModel
+    from app.models.order import Order
 
 
 
@@ -55,3 +60,11 @@ class User(Base):
         back_populates="user",
         cascade="all, delete, delete-orphan",
     )
+    shipping_model:Mapped[list["ShippingModel"]] = relationship(
+        "ShippingModel",
+        back_populates="user",
+        cascade="all, delete, delete-orphan",
+    )
+
+    order: Mapped[list["Order"]] = relationship("Order", back_populates="user")
+    payment_model:Mapped[list["PaymentModel"]] = relationship("PaymentModel", back_populates="user")
