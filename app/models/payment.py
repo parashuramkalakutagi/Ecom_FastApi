@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import List,Optional
-import enum
+from enum import Enum as PyEnum
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlalchemy.orm import Mapped,MappedColumn,relationship
 from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, Enum, Numeric
@@ -17,13 +17,13 @@ if TYPE_CHECKING:
     from app.models.shipping_model import ShippingModel,ShippingStatus,Shipping_Status
 
 
-class PaymentStatus(str, enum.Enum):
+class PaymentStatus(str, PyEnum):
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     CANCELED = "CANCELED"
 
-class PaymentGateway(str, enum.Enum):
+class PaymentGateway(str, PyEnum):
     mock = "mock"
     razorpay = "razorpay"
 

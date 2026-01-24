@@ -1,5 +1,9 @@
+
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.shipping import ShippingBase, ShippingCreate, ShippingResponse, DeleteResponse
+
+from app.models.order import OrderStatus
+from app.schemas.orders import OrderResponse
+from app.schemas.shipping import ShippingBase, ShippingCreate, ShippingResponse, DeleteResponse, ShippingStatusCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, cast, or_
 from typing import List
@@ -10,8 +14,8 @@ from fastapi import Query
 from sqlalchemy import select, func, and_
 from app.core.jwt_auth import require_admin, verify_jwt_token
 from app.db.config import get_session
-from app.models import User
-from app.models.shipping_model import ShippingModel
+from app.models import User, Order
+from app.models.shipping_model import ShippingModel, ShippingStatus
 
 router = APIRouter(prefix="/v1/shipping", tags=["shipping"])
 
@@ -122,3 +126,32 @@ async def delete_shipping(
     await db.commit()
     await db.refresh(shipping)
     return {"msg": "Shipping address deleted"}
+
+
+@router.patch("/status/{oder_id}",response_model=OrderResponse)
+async def update_shipping_status(
+        oder_id:int,
+        shipping_status: ShippingStatusCreate,
+        db:AsyncSession = Depends(get_session),
+        user: User = Depends(require_admin),
+):
+
+    stmt = await  db.execute(
+        select(Order)
+        .where(Order.id== oder_id)
+        .options(
+            selectinload(Order.order_item),
+            selectinload(Order.shipping_model),
+            selectinload(Order.Shipping_Status)
+
+        )
+    )
+    order = stmt.scalars().one_or_none()
+    if not order:
+        raise HTTPException(status_code=400, detail="order does not exist")
+
+    order.Shipping_Status.status = shipping_status.status
+    db.add(order)
+    await db.commit()
+    await db.refresh(order)
+    return order

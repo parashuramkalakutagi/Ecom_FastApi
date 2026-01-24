@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import List,Optional
-import enum
+from enum import Enum as PyEnum
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlalchemy.orm import Mapped,MappedColumn,relationship
 from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, Enum, Numeric
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 
-class OrderStatus(str, enum.Enum):
+class OrderStatus(str, PyEnum):
     pending = "pending"
     confirmed = "confirmed"
     cancelled = "cancelled"
@@ -39,6 +39,7 @@ class OrderItem(Base):
 
 
 class Order(Base):
+
     __tablename__ = "order"
     id:Mapped[int] = MappedColumn(Integer, primary_key=True, autoincrement=True)
     user_id:Mapped[int] = MappedColumn(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
@@ -50,6 +51,6 @@ class Order(Base):
     order_item:Mapped[List["OrderItem"]] = relationship("OrderItem", back_populates="order")
     shipping_model:Mapped["ShippingModel"] = relationship("ShippingModel", back_populates="order")
     user:Mapped["User"] = relationship("User", back_populates="order")
-    Shipping_Status:Mapped["Shipping_Status"] = relationship("ShippingStatus", back_populates="order")
+    Shipping_Status:Mapped["Shipping_Status"] = relationship("Shipping_Status", back_populates="order")
     payment_model:Mapped["PaymentModel"] = relationship("PaymentModel", back_populates="order")
 

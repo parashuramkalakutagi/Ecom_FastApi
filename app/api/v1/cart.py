@@ -103,6 +103,8 @@ async def add_to_cart(
         total_price=total_price,
         items=items
     )
+
+
 @router.delete("/{product_id}", response_model=CartResponse)
 async def delete_from_cart(
         product_id: int,
